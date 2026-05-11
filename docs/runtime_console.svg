@@ -13,7 +13,7 @@
         font-family="Consolas, monospace"
         font-size="18"
         fill="#c9d1d9">
-    runtime_console.log
+    Console
   </text>
 
   <!-- REQUEST -->

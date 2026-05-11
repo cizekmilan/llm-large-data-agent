@@ -7,7 +7,7 @@
 
 Modern LLMs are powerful reasoning systems, but they are still limited by:
 
-- finite context windows
+- finite context window
 - expensive token usage
 - limited reliability when processing large datasets
 - inability to safely paginate external APIs autonomously
@@ -228,6 +228,36 @@ Reducer responsibilities:
 - summarization
 - aggregation
 - removal of irrelevant payload data
+- reduction of context saturation
+- mitigation of attention dilution effects
+
+The reduction pipeline helps preserve relevant information density while minimizing unnecessary token usage.
+
+This is important because modern LLMs operate with a finite context window, and using the entire available context is not always optimal.
+
+Large prompts may suffer from:
+
+- attention dilution
+- lost-in-the-middle effects
+- degraded reasoning quality
+- higher latency
+- increased token costs
+
+For this reason, the framework distinguishes between:
+
+| Parameter | Description |
+|---|---|
+| `LLM_MAX_CONTEXT` | Maximum context size supported by the model |
+| `LLM_CONTEXT_UTILIZATION` | Intentionally allowed fraction of usable context |
+
+Example:
+
+```env
+LLM_MAX_CONTEXT=128000
+LLM_CONTEXT_UTILIZATION=0.25
+```
+
+In this configuration, the orchestration layer targets approximately 32k effective context usage, despite the model supporting 128k tokens.
 
 
 ## 7. Final Aggregation
