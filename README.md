@@ -359,6 +359,14 @@ Planned improvements:
 - distributed tool execution
 - MCP-native adapters
 
+## Distributed Processing Potential
+
+The paging/chunking architecture also enables future parallel and distributed processing.
+
+Because segments are processed independently, reducer tasks may be delegated to multiple models or hardware nodes concurrently.
+
+This may significantly reduce end-to-end processing latency and improve horizontal scalability.
+
 
 # Requirements
 
