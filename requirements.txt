@@ -1,0 +1,9 @@
+# demo API
+fastapi
+uvicorn
+
+dotenv
+requests
+openai
+tiktoken
+colorama
