@@ -331,7 +331,8 @@ python agent.py
 Example `.env`:
 
 ```env
-LLM_API_BASE_URL=http://127.0.0.1:8000/v1
+BASE_API_URL="http://127.0.0.1:9001"
+LLM_API_BASE_URL=http://your_opanai_api:8000/v1
 LLM_API_KEY=dummy
 LLM_NAME=gpt-4.1-mini
 LLM_MAX_CONTEXT=131072
