@@ -354,8 +354,8 @@ while True:
                                 logger.info(f"[PAGE {page_number}/{total_pages}] offset={offset} limit=items={limit}")
 
                                 # redukce jednoho chunku
-                                partial = transform_tool_output(items, user_query=user_query)
                                 logger.info(f"[PAGE {page_number}/{total_pages}] context reduction -> transformation function (summarization/agregation/selection/...)")
+                                partial = transform_tool_output(items, user_query=user_query)
                                 partial_results.append(partial)
 
                             # sloučení všech partial výsledků

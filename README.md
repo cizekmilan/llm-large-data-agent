@@ -352,11 +352,23 @@ The project includes runtime logging for:
 Example log output:
 
 ```text
-[TOOL SELECTED] get_tickets
-[META] total_items=261 total_tokens_est=355116
-[STRATEGY] PAGING ACTIVATED
-[PAGE] offset=0 limit=29 items=29
+[agent] LLM TOOL SELECTED: get_tickets, [ARGS: {'customer_id': 4}]
+[agent] API end-point supports metadata & pagination
+[agent] [META] total_items=261 total_tokens_est=355116
+[agent] [STRATEGY] PAGING ACTIVATED
+[agent] [CHUNKING] one chunk budget=32768 tokens
+[agent] [CHUNKING] avg_tokens_per_item=1117.10
+[agent] [CHUNKING] items count in one chunk: limit=29
+[agent] [CHUNKING] total pages: 9
+[agent] API CALL: GET http://127.0.0.1:9001/tickets?customer_id=4&offset=0&limit=29
+[agent] [PAGE 1/9] offset=0 limit=items=29
+[agent] [PAGE 1/9] context reduction -> transformation function (summarization/agregation/selection/...)
+...
+[reducer] [REDUCER] preview={"meta": {"strategy": "aggregation", "notes": "Aggregated key information about the customer ...
 [reducer] TOKEN CHANGE: 38402 -> 971 (Δ-37431 / -97.5%)
+...
+[agent] [PAGE 2/9] offset=29 limit=items=29
+...
 ```
 
 
