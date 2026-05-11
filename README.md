@@ -337,7 +337,7 @@ The logging system visually distinguishes individual orchestration stages and da
 The SVG image above demonstrates the approximate runtime appearance of the logging system.
 
 
-# Logging
+# 🔍 Logging
 
 The project includes runtime logging for:
 
@@ -447,7 +447,7 @@ LLM_TIMEOUT=60
 ```
 
 
-# 🔍 Research Goal
+# 🧪 Research Goal
 
 This project explores whether LLM agents can reliably operate over datasets that significantly exceed their native context window by combining:
 
