@@ -3,7 +3,7 @@
 > Experimental orchestration framework exploring how LLM agents can process datasets significantly larger than the model context window using iterative retrieval and semantic reduction.
 
 
-# Motivation
+# 🧠 Motivation
 
 Modern LLMs are powerful reasoning systems, but they are still limited by:
 
@@ -65,7 +65,7 @@ Core concepts:
 - short-term vs long-term memory separation
 
 
-# Key Features
+# 📋 Key Features
 
 ## OpenAPI Tool Generation
 
@@ -88,7 +88,7 @@ This prevents the model from attempting autonomous pagination during reasoning, 
 Relying only on SYSTEM_PROMPT instructions for pagination control was found to be insufficiently reliable in experimental runs.
 
 
-## Internal Pagination Handling
+## ⚙️ Internal Pagination Handling
 
 The LLM itself is intentionally isolated from pagination logic.
 
@@ -103,7 +103,7 @@ Pagination logic is handled internally by the executor layer:
 This significantly improves reliability compared to prompt-based pagination.
 
 
-## Semantic Data Reduction
+## 🧩 Semantic Data Reduction
 
 Large tool outputs are processed by a secondary LLM reducer.
 
@@ -143,7 +143,7 @@ Persistent conversation history:
 This prevents uncontrolled context growth.
 
 
-# Project Structure
+# 🗂️ Project Structure
 
 ```text
 /
@@ -313,7 +313,7 @@ The actual reduction ratio depends on:
 - aggregation strategy
 
 
-# Colored Runtime Console Logging
+# 📊 Colored Runtime Console Logging
 
 The framework provides structured colorized console logging designed for runtime tracing, orchestration debugging, and reducer inspection.
 
@@ -360,7 +360,7 @@ Example log output:
 ```
 
 
-# Current Limitations
+# ⚠️ Current Limitations
 
 This project is currently experimental.
 
@@ -375,7 +375,7 @@ Known limitations:
 - complex multi-question prompts may require future query decomposition/planning stages
 
 
-# Future Work
+# 🚀 Future Work
 
 Planned improvements:
 
@@ -459,11 +459,11 @@ rather than traditional chatbot interaction.
 
 Current status:
 
-- architecture prototype implemented
-- OpenAPI integration functional
-- adaptive pagination functional
-- reducer pipeline functional
-- semantic chunk reduction experimental
+- ✅ architecture prototype implemented
+- ✅ OpenAPI integration functional
+- ✅ adaptive pagination functional
+- ✅ reducer pipeline functional
+- ⚠️ semantic chunk reduction experimental
 
 
 # License
