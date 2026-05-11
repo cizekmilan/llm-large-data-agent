@@ -39,10 +39,8 @@ The project separates the system into multiple specialized layers:
 | Component                        | Responsibility                                     | Implementation |
 | -------------------------------- | -------------------------------------------------- | -------------- |
 | LLM1 (Main Agent / Orchestrator) | reasoning, planning, tool selection                | `agent.py`     |
-| Tool Adapter                     | OpenAPI › tool schema conversion                   | `agent.py`     |
-| Tool Executor                    | API/MCP execution, pagination, chunk orchestration | `agent.py`     |
+| Tool Adapter                     | OpenAPI tool generation, API execution, transport layer  | `adapters/openapi_adapter.py`   |
 | LLM2 (Reducer)                   | semantic reduction and aggregation                 | `reducer.py`   |
-
 
 Instead of allowing the main model to directly process extremely large datasets, the architecture:
 
@@ -59,6 +57,7 @@ Instead of allowing the main model to directly process extremely large datasets,
 Core concepts:
 
 - separation of orchestration and reduction
+- adapter-based tool provider abstraction
 - adaptive pagination
 - chunk-based processing
 - semantic reduction pipeline
@@ -148,6 +147,9 @@ This prevents uncontrolled context growth.
 
 ```text
 /
+├── adapters/
+│   └── openapi_adapter.py           # OpenAPI tool adapter abstraction
+│
 ├── agent.py                         # Main orchestration agent
 ├── misc.py                          # Shared helper functions
 ├── mock_api.py                      # Mock OpenAPI server
@@ -398,7 +400,7 @@ A dedicated planning/decomposition stage could split such queries into independe
 Planned improvements:
 
 - orchestrator/reducer prompt strategy improvements
-- MCP-native adapters
+- MCP adapter implementation
 - distributed processing
 - recursive reduction pipelines
 - adaptive reduction strategies
@@ -477,7 +479,7 @@ rather than traditional chatbot interaction.
 Current status:
 
 - ✅ architecture prototype implemented
-- ✅ OpenAPI integration functional
+- ✅ OpenAPI adapter abstraction implemented
 - ✅ adaptive pagination functional
 - ✅ reducer pipeline functional
 - ⚠️ semantic chunk reduction experimental
