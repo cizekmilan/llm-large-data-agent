@@ -354,6 +354,7 @@ Example log output:
 ```text
 [agent] LLM TOOL SELECTED: get_tickets, [ARGS: {'customer_id': 4}]
 [agent] API end-point supports metadata & pagination
+[agent] API CALL: GET http://127.0.0.1:9001/tickets?customer_id=4&meta_only=True
 [agent] [META] total_items=261 total_tokens_est=355116
 [agent] [STRATEGY] PAGING ACTIVATED
 [agent] [CHUNKING] one chunk budget=32768 tokens
