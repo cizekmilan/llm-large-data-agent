@@ -15,6 +15,7 @@ import logging
 import math
 
 # vlastní funkce
+from adapters.openapi_adapter import OpenAPIAdapter
 from reducer import transform_tool_output
 from misc import get_user_query, estimate_tokens, sanitize_text, debug_request, debug_response
 
@@ -63,95 +64,10 @@ client = OpenAI(
 )
 
 
-# === sestavení tools z OpenAPI JSON
-
-def load_openapi_tools(url):
-    spec = requests.get(url).json()
-
-    tools = []        # definice funkcí pro LLM (neobsahuje vyloučené parametry)
-    operations = {}   # metadata pro executor (plná informace, včetně pagination/meta)
-
-    # parametry, které nechci vystavovat LLM (interní řízení)
-    LLM_EXCLUDED_PARAMS = {"limit", "offset", "meta_only"}
-
-    for path, methods in spec.get("paths", {}).items():
-        for method, op in methods.items():
-            name = op.get("operationId")
-            if not name:
-                continue
-
-            description = op.get("description", "")
-
-            # 1) NASBÍRÁNÍ PARAMETRŮ (query, path, body)
-            properties = {}
-            required = []
-
-            # query + path parametry
-            for p in op.get("parameters", []):
-                pname = p["name"]
-
-                properties[pname] = {
-                    **p.get("schema", {"type": "string"}),
-                    "description": p.get("description", "")
-                }
-
-                if p.get("required"):
-                    required.append(pname)
-
-            # requestBody (JSON)
-            if "requestBody" in op:
-                content = op["requestBody"].get("content", {})
-                if "application/json" in content:
-                    schema = content["application/json"].get("schema", {})
-
-                    properties.update(schema.get("properties", {}))
-                    required.extend(schema.get("required", []))
-
-            # 2) DETEKCE SCHOPNOSTÍ ENDPOINTU (pro executor)
-            param_names = set(properties.keys())
-
-            pagination_supported = "limit" in param_names and "offset" in param_names
-            meta_supported = "meta_only" in param_names
-
-            # 3) FILTRACE PARAMETRŮ PRO LLM - LLM nesmí vidět pagination ani meta_only
-            llm_properties = {
-                k: v for k, v in properties.items()
-                if k not in LLM_EXCLUDED_PARAMS
-            }
-
-            llm_required = [
-                r for r in required
-                if r not in LLM_EXCLUDED_PARAMS
-            ]
-
-            # 4) TOOLS PRO LLM - pouze business parametry
-            tools.append({
-                "type": "function",
-                "name": name,
-                "description": description,
-                "parameters": {
-                    "type": "object",
-                    "properties": llm_properties,
-                    "required": list(set(llm_required)),
-                    "additionalProperties": False  # LLM nesmí vymýšlet nové parametry
-                }
-            })
-
-            # 5) OPERACE PRO EXECUTOR - včetně rozšiřujících metadat
-            operations[name] = {
-                "method": method.upper(),
-                "path": path,
-                # schopnosti endpointu
-                "pagination": pagination_supported,
-                "meta_supported": meta_supported,
-            }
-
-    return tools, operations
-
-
 # tools = definice funkcí pro LLM (název, popis, parametry), tedy ve formátu, kterému LLM dobře rozumí
-# operations = využívám zde v orchestraci pro reálné volání REST API (methoda + endpoint pro volání)
-tools, operations = load_openapi_tools(BASE_API_URL + "/openapi.json")
+# operations = využívám zde v orchestraci pro reálné volání toolu
+adapter = OpenAPIAdapter(BASE_API_URL, BASE_API_TOKEN)
+tools, operations = adapter.get_tools()
 
 
 # === definice PROMPT
@@ -172,40 +88,6 @@ You are NOT allowed to answer from your own knowledge.
 - Answer in Czech language.
 - Use Markdown formatting.
 """
-
-
-# === API CALLER
-
-def call_api(operation, args):
-    method = operation["method"]
-    path = operation["path"]
-
-    url = BASE_API_URL + path
-
-    headers = {
-        "Accept": "application/stis+json;version=1"
-    }
-
-    #if BASE_API_TOKEN:
-    #    headers["Authorization"] = f"Bearer {BASE_API_TOKEN}"
-
-    try:
-        if method == "GET":
-            r = requests.get(url, params=args, headers=headers, timeout=10)
-            logger.info(f"API CALL: {method} {r.url}")
-        elif method == "POST":
-            r = requests.post(url, json=args, headers=headers, timeout=10)
-            logger.info(f"API CALL: {method} {url} body={args}")
-        else:
-            logger.error(f"API CALL: Unsupported method {method}")
-            return {"error": f"Unsupported method {method}"}
-
-        r.raise_for_status()
-        return r.json()
-
-    except Exception as e:
-        logger.error(f"API ERROR: {method} {url} args={args} error={e}")
-        return {"error": str(e)}
 
 
 # === USER CHAT LOOP
@@ -303,9 +185,9 @@ while True:
                         logger.info("API end-point supports metadata & pagination")
 
                         # zjistím velikost dat a počet
-                        meta = call_api(op, {**args, "meta_only": True})
+                        meta = adapter.call_tool(op, {**args, "meta_only": True})
                         data_path = meta.get("data_path", "items")
-                        total_tokens = meta.get("tokens_estimation", 0)  # jak objemná jsou data vrácená z API callu?
+                        total_tokens = meta.get("tokens_estimation", 0)  # jak objemná jsou data vrácená tool callem?
                         total_items = meta.get("total_items", 0)
 
                         logger.info(f"[META] total_items={total_items}, total_tokens_est={total_tokens}")
@@ -320,7 +202,7 @@ while True:
                         elif total_tokens < CHUNK_BUDGET:
                             # na endpointu je málo dat, vše se zvládne jedním chunkem (netřeba stránkovat)
                             logger.info("[STRATEGY] SINGLE CALL (no paging)")
-                            result = call_api(op, args)
+                            result = adapter.call_tool(op, args)
                         else:
                             # na endpointu je málo dat, bude se stránkovat ...
                             logger.info("[STRATEGY] PAGING ACTIVATED")
@@ -344,7 +226,7 @@ while True:
 
                             for offset in range(0, total_items, limit):
                                 page_number = (offset // limit) + 1
-                                page = call_api(op, {**args, "offset": offset, "limit": limit})
+                                page = adapter.call_tool(op, {**args, "offset": offset, "limit": limit})
 
                                 current = page
                                 for key in data_path.split("."):
@@ -365,7 +247,7 @@ while True:
                     else:
                       # end-point nepodporuje stránkování, neřeším a volám rovnou
                       logger.info("API end-point without metadata (pagination) support")
-                      result = call_api(operations[name], args)
+                      result = adapter.call_tool(operations[name], args)
 
 
                 print(Fore.YELLOW + "--- TOOL RESULT ---")

@@ -336,7 +336,7 @@ The logging system visually distinguishes individual orchestration stages and da
 
 ![Runtime Console](docs/runtime_console.svg)
 
-The SVG image above demonstrates the approximate runtime appearance of the logging system.
+The image above demonstrates the approximate runtime appearance of the logging system.
 
 
 # 🔍 Logging

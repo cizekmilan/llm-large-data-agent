@@ -16,9 +16,12 @@ from fastapi import Query
 # pro mock tiketů z json pro user id:4
 import json
 from pathlib import Path
+import logging
+
 #BIG_TICKETS_PATH = Path("mockdata/customer4.json")
 BIG_TICKETS_PATH = Path("mockdata/customer4_anonymized.json")
 
+logger = logging.getLogger(__name__)
 
 # =========================
 # MOCK DATA
@@ -72,7 +75,7 @@ payments = {
 # defaultně srstavuje operationId: {název funkce}_{path}_{metoda}, tedy např. get_customer_by_lastname_customer_by_lastname_get
 # =========================
 
-seen_operation_ids = set()  # jen pko kontrolu unik8tnosti/duplicit
+seen_operation_ids = set()  # jen pko kontrolu unikátnosti/duplicit
 
 def make_operation_id(route: APIRoute) -> str:
     # HTTP metoda (GET, POST…)
@@ -200,6 +203,7 @@ def get_tickets(
 
             all_tickets = data.get("allTickets", [])
         except Exception as e:
+            logger.exception("Failed to load big tickets")
             raise HTTPException(status_code=500, detail=f"Failed to load big tickets: {e}")
     else:
         all_tickets = tickets.get(customer_id, [])
