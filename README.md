@@ -344,6 +344,7 @@ Known limitations:
 - no retry orchestration layer
 - structured output reliability depends on model behavior
 - context overflow handling is still evolving
+- complex multi-question prompts may require future query decomposition/planning stages
 
 
 # Future Work
