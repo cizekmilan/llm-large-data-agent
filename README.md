@@ -434,7 +434,7 @@ LLM_TIMEOUT=60
 ```
 
 
-# Research Goal
+# 🔍 Research Goal
 
 This project explores whether LLM agents can reliably operate over datasets that significantly exceed their native context window by combining:
 
