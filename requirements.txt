@@ -4,6 +4,7 @@ uvicorn
 
 dotenv
 requests
+mcp
 openai
 tiktoken
 colorama

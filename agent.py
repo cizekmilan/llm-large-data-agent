@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# v4: oddělení OpenAPI (sestavení toolů, volání) do adaptéru příprava pro paralelní MCP adaptér
 # v3: přesun logiky stránkování z LLM do kódu, meta data, ošetření výjimek
 # v2: přidává možnost ptát se opakovaně a drží v kontextu předešlou konverzaci (krátkodobá + dlouhodobá paměť)
 
@@ -16,6 +17,7 @@ import math
 
 # vlastní funkce
 from adapters.openapi_adapter import OpenAPIAdapter
+from adapters.mcp_adapter import MCPAdapter
 from reducer import transform_tool_output
 from misc import get_user_query, estimate_tokens, sanitize_text, debug_request, debug_response
 
@@ -39,6 +41,9 @@ LOG_DIR = os.getenv("LOG_DIR", "logs")
 
 BASE_API_URL = os.getenv("BASE_API_URL", "http://127.0.0.1:9001")
 BASE_API_TOKEN = os.getenv("BASE_API_TOKEN")
+
+MCP_URL = os.getenv("MCP_URL")
+MCP_TOKEN = os.getenv("MCP_TOKEN")
 
 
 Path(LOG_DIR).mkdir(exist_ok=True)
@@ -66,7 +71,8 @@ client = OpenAI(
 
 # tools = definice funkcí pro LLM (název, popis, parametry), tedy ve formátu, kterému LLM dobře rozumí
 # operations = využívám zde v orchestraci pro reálné volání toolu
-adapter = OpenAPIAdapter(BASE_API_URL, BASE_API_TOKEN)
+adapter = OpenAPIAdapter(BASE_API_URL, BASE_API_TOKEN)  # pro OpenAPI
+#adapter = MCPAdapter(MCP_URL, MCP_TOKEN)  # pro MCP
 tools, operations = adapter.get_tools()
 
 
