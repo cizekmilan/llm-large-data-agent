@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360">
+
+  <rect width="100%" height="100%" rx="12" fill="#0d1117"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="42" fill="#161b22" rx="12"/>
+
+  <circle cx="24" cy="21" r="6" fill="#ff5f56"/>
+  <circle cx="44" cy="21" r="6" fill="#ffbd2e"/>
+  <circle cx="64" cy="21" r="6" fill="#27c93f"/>
+
+  <text x="90" y="27"
+        font-family="Consolas, monospace"
+        font-size="18"
+        fill="#c9d1d9">
+    runtime_console.log
+  </text>
+
+  <!-- REQUEST -->
+  <text x="28" y="80"
+        font-family="Consolas, monospace"
+        font-size="20"
+        fill="#58a6ff">
+    [REQUEST (LLM1)]
+  </text>
+
+  <!-- RESPONSE -->
+  <text x="28" y="120"
+        font-family="Consolas, monospace"
+        font-size="20"
+        fill="#3fb950">
+    [RESPONSE (LLM1)]
+  </text>
+
+  <!-- TOOL RESULT -->
+  <text x="28" y="160"
+        font-family="Consolas, monospace"
+        font-size="20"
+        fill="#d29922">
+    --- TOOL RESULT ---
+  </text>
+
+  <!-- REDUCER REQUEST BG -->
+  <rect x="20" y="188" width="1060" height="38" rx="4" fill="#1f3b73"/>
+  <text x="28" y="214"
+        font-family="Consolas, monospace"
+        font-size="20"
+        fill="#58a6ff">
+    [REQUEST (LLM2_REDUCER)]
+  </text>
+
+  <!-- REDUCER RESPONSE BG -->
+  <rect x="20" y="232" width="1060" height="38" rx="4" fill="#1f3b73"/>
+  <text x="28" y="258"
+        font-family="Consolas, monospace"
+        font-size="20"
+        fill="#3fb950">
+    [RESPONSE (LLM2_REDUCER)]
+  </text>
+
+  <!-- ITEM TYPES -->
+  <text x="28" y="305"
+        font-family="Consolas, monospace"
+        font-size="20"
+        fill="#bc8cff">
+    ITEM TYPES (2): reasoning, message
+  </text>
+
+  <!-- TOKEN CHANGE BG -->
+  <rect x="20" y="320" width="1060" height="42" rx="4" fill="#ffffff"/>
+  <text x="28" y="348"
+        font-family="Consolas, monospace"
+        font-size="22"
+        fill="#d1242f">
+    TOKEN CHANGE: 76037 -> 256 (Δ-75781 / -99.7%)
+  </text>
+
+</svg>

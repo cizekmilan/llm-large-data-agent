@@ -162,12 +162,14 @@ This prevents uncontrolled context growth.
 
 The user sends a query to the orchestrator.
 
-Example:
+Examples:
 
 ```text
-Zjisti vše o uživateli Baláž.
+user_query> Zjisti vše o uživateli Baláž.
 ```
-
+```text
+user_query> Zjisti vše o uživateli Králová.
+```
 
 ## 2. Tool Selection
 
@@ -253,6 +255,30 @@ The actual reduction ratio depends on:
 - aggregation strategy
 
 
+# Colored Runtime Console Logging
+
+The framework provides structured colorized console logging designed for runtime tracing, orchestration debugging, and reducer inspection.
+
+The logging system visually distinguishes individual orchestration stages and data flows, making complex LLM interactions significantly easier to analyze in real time.
+
+## Console Color Categories
+
+| Color | Meaning |
+|---|---|
+| Blue text | REQUEST sent to the main LLM |
+| Green text | RESPONSE received from the main LLM |
+| Yellow text | Tool execution results |
+| Blue/green text on blue background | Reducer LLM requests and responses |
+| Purple text | Response structure and item types |
+| Red text on white background | Token statistics, reductions, context usage |
+
+### Example Console Visualization
+
+![Runtime Console](docs/runtime_console.svg)
+
+The SVG image above demonstrates the approximate runtime appearance of the logging system.
+
+
 # Logging
 
 The project includes runtime logging for:
@@ -272,7 +298,7 @@ Example log output:
 [META] total_items=261 total_tokens_est=355116
 [STRATEGY] PAGING ACTIVATED
 [PAGE] offset=0 limit=29 items=29
-[TOKEN CHANGE] 39135 -> 1842 (-95.3%)
+[reducer] TOKEN CHANGE: 38402 -> 971 (Δ-37431 / -97.5%)
 ```
 
 
@@ -331,8 +357,7 @@ python agent.py
 Example `.env`:
 
 ```env
-BASE_API_URL="http://127.0.0.1:9001"
-LLM_API_BASE_URL=http://your_opanai_api:8000/v1
+LLM_API_BASE_URL=http://127.0.0.1:9001/v1
 LLM_API_KEY=dummy
 LLM_NAME=gpt-4.1-mini
 LLM_MAX_CONTEXT=131072
