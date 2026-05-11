@@ -1,8 +1,7 @@
 # LLM Agent for Large-Scale Data Processing on Models with Limited Context
 
-> Experimental orchestration framework for processing large external datasets using LLMs with limited context windows.
+> Experimental orchestration framework exploring how LLM agents can process datasets significantly larger than the model context window using iterative retrieval and semantic reduction.
 
----
 
 # Motivation
 
@@ -10,7 +9,7 @@ Modern LLMs are powerful reasoning systems, but they are still limited by:
 
 - finite context windows
 - expensive token usage
-- unreliable handling of large datasets
+- limited reliability when processing large datasets
 - inability to safely paginate external APIs autonomously
 
 In real-world environments, external systems often return:
@@ -32,7 +31,6 @@ The goal of this project is to explore an architecture that allows an LLM agent 
 - preserve only relevant information
 - continue reasoning within limited context budgets
 
----
 
 # Main Idea
 
@@ -52,11 +50,10 @@ Instead of allowing the main model to directly process extremely large datasets,
 3. semantically compresses results
 4. injects only reduced outputs back into the agent context
 
----
 
 # Architecture Overview
 
-![Architecture Diagram](docs/architecture_v3.png)
+![Architecture Diagram](docs/architecture_v3.svg)
 
 Core concepts:
 
@@ -67,7 +64,6 @@ Core concepts:
 - OpenAPI-driven tool generation
 - short-term vs long-term memory separation
 
----
 
 # Key Features
 
@@ -80,11 +76,10 @@ The framework dynamically parses `openapi.json` and generates:
 
 This allows external APIs to be integrated with minimal changes.
 
----
 
 ## Internal Pagination Handling
 
-The LLM itself does not control pagination.
+The LLM itself is intentionally isolated from pagination logic.
 
 Pagination logic is handled internally by the executor layer:
 
@@ -96,7 +91,6 @@ Pagination logic is handled internally by the executor layer:
 
 This significantly improves reliability compared to prompt-based pagination.
 
----
 
 ## Semantic Data Reduction
 
@@ -112,7 +106,6 @@ The reducer:
 
 This enables multi-step reasoning over datasets that would otherwise exceed model limits.
 
----
 
 ## Context Management
 
@@ -136,35 +129,32 @@ Persistent conversation history:
 
 This prevents uncontrolled context growth.
 
----
 
 # Project Structure
 
 ```text
-project/
-│
-├── test_native_mockapi3.py      # Main orchestration agent
+/
+├── agent.py                     # Main orchestration agent
 ├── reducer.py                   # Semantic reducer (LLM2)
 ├── misc.py                      # Shared helper functions
-├── demo_mock_api.py             # Mock OpenAPI server
+├── mock_api.py                  # Mock OpenAPI server
 │
 ├── mockdata/                    # Large mock datasets
 │   ├── tickets_big.json
-│   ├── customers.json
 │   └── ...
 │
 ├── logs/
-│   └── debug.log                # Runtime logs
+│   └── debug_*.log              # Runtime logs
 │
 ├── docs/
-│   └── architecture_v3.png      # Architecture diagram
+│   ├── architecture_v3.png      # Architecture diagram in PNG format
+│   └── architecture_v3.svg      # Architecture diagram in SVG format
 │
 ├── .env                         # Runtime configuration
 ├── requirements.txt
 └── README.md
 ```
 
----
 
 # Workflow
 
@@ -178,7 +168,6 @@ Example:
 Zjisti vše o uživateli Baláž.
 ```
 
----
 
 ## 2. Tool Selection
 
@@ -190,7 +179,6 @@ The model receives:
 - tool descriptions
 - parameter schemas
 
----
 
 ## 3. Metadata Retrieval
 
@@ -202,11 +190,10 @@ GET /tickets?meta_only=true
 
 The API returns:
 
-- estimated token size
+- estimated data token size
 - total item count
 - optional data path metadata
 
----
 
 ## 4. Adaptive Chunking
 
@@ -216,7 +203,6 @@ The executor calculates:
 - optimal chunk size
 - number of API calls required
 
----
 
 ## 5. Iterative Data Loading
 
@@ -229,7 +215,6 @@ GET /tickets?offset=58&limit=29
 ...
 ```
 
----
 
 ## 6. Semantic Reduction
 
@@ -242,7 +227,6 @@ Reducer responsibilities:
 - aggregation
 - removal of irrelevant payload data
 
----
 
 ## 7. Final Aggregation
 
@@ -250,7 +234,6 @@ Reduced chunk outputs are merged and injected back into the orchestrator context
 
 The main agent then continues reasoning using compressed information.
 
----
 
 # Example Reduction Statistics
 
@@ -269,7 +252,6 @@ The actual reduction ratio depends on:
 - reducer prompt quality
 - aggregation strategy
 
----
 
 # Logging
 
@@ -293,7 +275,6 @@ Example log output:
 [TOKEN CHANGE] 39135 -> 1842 (-95.3%)
 ```
 
----
 
 # Current Limitations
 
@@ -305,10 +286,9 @@ Known limitations:
 - token estimation is heuristic
 - no recursive reduction strategy yet
 - no retry orchestration layer
-- structured outputs are not fully enforced
+- structured output reliability depends on model behavior
 - context overflow handling is still evolving
 
----
 
 # Future Work
 
@@ -323,32 +303,28 @@ Planned improvements:
 - distributed tool execution
 - MCP-native adapters
 
----
 
 # Requirements
 
-- Python 3.11+
+- Python 3.10+
 - OpenAI-compatible Responses API
 - FastAPI
 - Uvicorn
 
----
 
 # Running the Mock API
 
 ```bash
-uvicorn demo_mock_api:app --port 9001 --reload
+uvicorn mock_api:app --port 9001 --reload
 ```
 
----
 
 # Running the Agent
 
 ```bash
-python test_native_mockapi3.py
+python agent.py
 ```
 
----
 
 # Environment Variables
 
@@ -365,7 +341,6 @@ LLM_TOP_P=1.0
 LLM_TIMEOUT=60
 ```
 
----
 
 # Research Goal
 
@@ -384,9 +359,8 @@ The project focuses primarily on:
 - scalable tool usage
 - semantic reduction strategies
 
-rather than end-user chatbot functionality.
+rather than traditional chatbot interaction.
 
----
 
 # Status
 
@@ -398,7 +372,6 @@ Current status:
 - reducer pipeline functional
 - semantic chunk reduction experimental
 
----
 
 # License
 
