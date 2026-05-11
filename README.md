@@ -120,7 +120,7 @@ Reduction may be skipped for smaller payloads where orchestration overhead would
 This enables multi-step reasoning over datasets that would otherwise exceed model limits.
 
 
-## Context Management
+## 📦 Context Management
 
 The project distinguishes between:
 
@@ -169,7 +169,7 @@ This prevents uncontrolled context growth.
 ```
 
 
-# Workflow
+# 🔄 Workflow
 
 ## 1. User Query
 
@@ -295,7 +295,7 @@ Reduced chunk outputs are merged and injected back into the orchestrator context
 The main agent then continues reasoning using compressed information.
 
 
-# Example Reduction Statistics
+# 📉 Example Reduction Statistics
 
 The following values are approximate examples from experimental runs.
 
@@ -313,7 +313,7 @@ The actual reduction ratio depends on:
 - aggregation strategy
 
 
-# 📊 Colored Runtime Console Logging
+# 🎨 Colored Runtime Console Logging
 
 The framework provides structured colorized console logging designed for runtime tracing, orchestration debugging, and reducer inspection.
 
@@ -396,7 +396,7 @@ Because segments are processed independently, reducer tasks may be delegated to 
 This may significantly reduce end-to-end processing latency and improve horizontal scalability.
 
 
-# Requirements
+# 🔧 Requirements
 
 - Python 3.10+
 - OpenAI-compatible Responses API
