@@ -36,12 +36,13 @@ The goal of this project is to explore an architecture that allows an LLM agent 
 
 The project separates the system into multiple specialized layers:
 
-| Component | Responsibility |
-|---|---|
-| **LLM1 (Main Agent / Orchestrator)** | reasoning, planning, tool selection |
-| **Tool Adapter** | OpenAPI → tool schema conversion |
-| **Tool Executor** | API/MCP execution, pagination, chunk orchestration |
-| **LLM2 (Reducer)** | semantic reduction and aggregation of large payloads |
+| Component                        | Responsibility                                     | Implementation |
+| -------------------------------- | -------------------------------------------------- | -------------- |
+| LLM1 (Main Agent / Orchestrator) | reasoning, planning, tool selection                | `agent.py`     |
+| Tool Adapter                     | OpenAPI › tool schema conversion                   | `agent.py`     |
+| Tool Executor                    | API/MCP execution, pagination, chunk orchestration | `agent.py`     |
+| LLM2 (Reducer)                   | semantic reduction and aggregation                 | `reducer.py`   |
+
 
 Instead of allowing the main model to directly process extremely large datasets, the architecture:
 
@@ -115,7 +116,7 @@ The reducer:
 - aggregates repeated information
 - minimizes context growth
 
-Reduction may be skipped for smaller payloads where orchestration overhead would exceed reduction benefits.
+*Reduction may be skipped for smaller payloads where orchestration overhead would exceed reduction benefits.*
 
 This enables multi-step reasoning over datasets that would otherwise exceed model limits.
 
@@ -148,9 +149,9 @@ This prevents uncontrolled context growth.
 ```text
 /
 ├── agent.py                         # Main orchestration agent
-├── reducer.py                       # Semantic reducer (LLM2)
 ├── misc.py                          # Shared helper functions
 ├── mock_api.py                      # Mock OpenAPI server
+├── reducer.py                       # Semantic reducer (LLM2)
 │
 ├── mockdata/                        # Large mock datasets
 │   ├── customer4_anonymized.json
@@ -230,8 +231,9 @@ Expected metadata structure:
 The executor calculates:
 
 - average tokens per item
-- optimal chunk size
-- number of API calls required
+- optimal chunk/page size
+- estimated number of pages (API calls)
+- effective context utilization
 
 
 ## 5. Iterative Data Loading
@@ -385,8 +387,11 @@ Known limitations:
 - no retry orchestration layer
 - structured output reliability depends on model behavior
 - context overflow handling is still evolving
-- complex multi-question prompts may require future query decomposition/planning stages
+- complex multi-question prompts may require future query decomposition/planning stages[^1]
 
+[^1]: *Currently, if a single query contains multiple independent questions (e.g., about two different users), the orchestrator processes them sequentially within the same prompt.
+Due to chunking, retrieval, and reduction, the model typically produces a correct answer only for the first question, while subsequent questions may be ignored or incomplete.  
+A dedicated planning/decomposition stage could split such queries into independent subqueries, assign them to the retrieval/reduction pipeline, and aggregate results reliably.*
 
 # 🚀 Future Work
 
