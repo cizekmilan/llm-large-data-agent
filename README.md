@@ -104,6 +104,8 @@ The reducer:
 - aggregates repeated information
 - minimizes context growth
 
+Reduction may be skipped for smaller payloads where orchestration overhead would exceed reduction benefits.
+
 This enables multi-step reasoning over datasets that would otherwise exceed model limits.
 
 
