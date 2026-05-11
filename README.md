@@ -134,23 +134,23 @@ This prevents uncontrolled context growth.
 
 ```text
 /
-├── agent.py                     # Main orchestration agent
-├── reducer.py                   # Semantic reducer (LLM2)
-├── misc.py                      # Shared helper functions
-├── mock_api.py                  # Mock OpenAPI server
+├── agent.py                         # Main orchestration agent
+├── reducer.py                       # Semantic reducer (LLM2)
+├── misc.py                          # Shared helper functions
+├── mock_api.py                      # Mock OpenAPI server
 │
-├── mockdata/                    # Large mock datasets
-│   ├── tickets_big.json
+├── mockdata/                        # Large mock datasets
+│   ├── customer4_anonymized.json
 │   └── ...
 │
 ├── logs/
-│   └── debug_*.log              # Runtime logs
+│   └── debug_*.log                  # Runtime logs
 │
 ├── docs/
-│   ├── architecture_v3.png      # Architecture diagram in PNG format
-│   └── architecture_v3.svg      # Architecture diagram in SVG format
+│   ├── architecture_v3.png          # Architecture diagram in PNG format
+│   └── architecture_v3.svg          # Architecture diagram in SVG format
 │
-├── .env                         # Runtime configuration
+├── .env                             # Runtime configuration
 ├── requirements.txt
 └── README.md
 ```
