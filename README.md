@@ -379,14 +379,13 @@ Known limitations:
 
 Planned improvements:
 
-- recursive reduction pipelines
-- vector memory integration
-- automatic retry strategies
-- context-aware reducer prompts
-- structured JSON schema enforcement
-- streaming chunk processing
-- distributed tool execution
+- orchestrator/reducer prompt strategy improvements
 - MCP-native adapters
+- distributed processing
+- recursive reduction pipelines
+- adaptive reduction strategies
+- structured output enforcement
+- streaming chunk processing
 
 ## Distributed Processing Potential
 
