@@ -184,17 +184,32 @@ The model receives:
 
 ## 3. Metadata Retrieval
 
-If the endpoint supports pagination:
+If the endpoint supports pagination (typically via `offset` and `limit` parameters), it is also expected to support lightweight metadata-only requests.
+
+Example:
 
 ```text
 GET /tickets?meta_only=true
 ```
 
-The API returns:
+The metadata response is used for orchestration planning before full retrieval begins.
 
-- estimated data token size
+The metadata typically includes:
+
+- estimated token size
 - total item count
-- optional data path metadata
+- path to paginated payload data
+
+Expected metadata structure:
+
+```python
+{
+  "customer_id": customer_id,
+  "data_path": "tickets",  # path to paginated data within the response, supports dot notation, e.g. "items.tickets"
+  "tokens_estimation": tokens_estimation,
+  "total_items": total
+}
+```
 
 
 ## 4. Adaptive Chunking
