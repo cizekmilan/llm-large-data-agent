@@ -76,6 +76,17 @@ The framework dynamically parses `openapi.json` and generates:
 
 This allows external APIs to be integrated with minimal changes.
 
+The framework intentionally separates:
+
+- LLM-facing tool schemas
+- internal executor orchestration metadata
+
+Pagination-related parameters such as `offset` and `limit` are intentionally removed from the tool schemas exposed to the LLM.
+
+This prevents the model from attempting autonomous pagination during reasoning, because pagination orchestration is handled exclusively by the executor layer.
+
+Relying only on SYSTEM_PROMPT instructions for pagination control was found to be insufficiently reliable in experimental runs.
+
 
 ## Internal Pagination Handling
 
