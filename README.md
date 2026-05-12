@@ -62,12 +62,10 @@ Instead of allowing the main model to directly process extremely large datasets,
 Core concepts:
 
 - separation of orchestration and reduction
-- adapter-based tool provider abstraction
-- adaptive pagination
-- chunk-based processing
+- adaptive processing strategies
+- chunk-based orchestration
 - semantic reduction pipeline
-- provider-agnostic tool integration
-- OpenAPI and MCP adapter abstraction
+- adapter-based OpenAPI and MCP integration
 - short-term vs long-term memory separation
 
 
@@ -106,30 +104,28 @@ Relying only on SYSTEM_PROMPT instructions for pagination control was found to b
 
 ## ⚙️ Internal Pagination Handling
 
-The LLM itself is intentionally isolated from pagination logic.
+Pagination orchestration is intentionally handled outside the LLM reasoning layer.
 
-Pagination logic is handled internally by the executor layer:
+The executor controls:
 
-- metadata retrieval (`meta_only`)
-- token estimation
-- adaptive chunk sizing
-- iterative API calls
-- chunk orchestration
+- metadata retrieval
+- chunk sizing
+- iterative paging
+- retrieval orchestration
 
-This significantly improves reliability compared to prompt-based pagination.
+This improves reliability compared to prompt-driven pagination.
 
 
 ## 🧩 Semantic Data Reduction
 
-Large tool outputs are processed by a secondary LLM reducer.
+Large tool outputs may be semantically reduced before reinjection into the orchestration context.
 
-The reducer:
+Reduction strategies include:
 
-- removes irrelevant data
-- preserves linking identifiers
-- compresses verbose structures
-- aggregates repeated information
-- minimizes context growth
+- filtering
+- summarization
+- aggregation
+- compression of verbose structures
 
 *Reduction may be skipped for smaller payloads where orchestration overhead would exceed reduction benefits.*
 
@@ -173,7 +169,7 @@ This prevents uncontrolled context growth.
 ├── reducer.py                       # Semantic reducer (LLM2)
 │
 ├── mockdata/                        # Large mock datasets
-│   ├── customer4_anonymized.json
+│   ├── customer4_anonymized.json    # temporarily removed from repository
 │   └── ...
 │
 ├── logs/
@@ -187,6 +183,8 @@ This prevents uncontrolled context growth.
 ├── requirements.txt
 └── README.md
 ```
+
+*The original large mock dataset was temporarily removed from the repository because, despite anonymization efforts, it could still potentially contain sensitive information.*
 
 
 # 🔄 Workflow
@@ -437,7 +435,7 @@ Known limitations:
 - no retry orchestration layer
 - structured output reliability depends on model behavior
 - context overflow handling is still evolving
-- complex multi-question prompts may require future query decomposition/planning stages[^1]
+- complex multi-question prompts are not yet reliably decomposed into independent retrieval/reduction workflows[^1]
 
 [^1]: *Currently, if a single query contains multiple independent questions (e.g., about two different users), the orchestrator processes them sequentially within the same prompt.
 Due to chunking, retrieval, and reduction, the model typically produces a correct answer only for the first question, while subsequent questions may be ignored or incomplete.  
