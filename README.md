@@ -43,6 +43,10 @@ The project separates the system into multiple specialized layers:
 | MCP Adapter                      | MCP tool discovery, JSON-RPC transport execution   | `adapters/mcp_adapter.py`     |
 | LLM2 (Reducer)                   | semantic reduction and aggregation                 | `reducer.py`                  |
 
+Although the architecture uses the terms **LLM1** and **LLM2**, this distinction is primarily logical rather than physical.
+
+In the default configuration, both orchestration and reduction are typically performed by the same underlying model. The separation mainly represents different processing roles and prompting strategies within the pipeline.
+
 Instead of allowing the main model to directly process extremely large datasets, the architecture:
 
 1. loads data iteratively
@@ -210,6 +214,8 @@ The model receives:
 - tool descriptions
 - parameter schemas
 
+If the model responds without selecting a tool, the response is treated as the final assistant answer and the orchestration loop terminates.
+
 
 ## 3. Metadata Retrieval
 
@@ -241,19 +247,50 @@ Expected metadata structure:
 ```
 
 
-## 4. Adaptive Chunking
+## 4. Adaptive Processing Strategy
 
-The executor calculates:
+Based on estimated payload size, pagination support, and effective context utilization, the executor dynamically selects one of several processing strategies:
 
-- average tokens per item
-- optimal chunk/page size
-- estimated number of pages (API calls)
-- effective context utilization
+```text
+◇ Processing Strategy
+   ├─ Direct Pass
+   │    Small payloads are injected directly into context
+   │
+   ├─ Single Reduction
+   │    Moderate payloads are reduced in a single reducer pass
+   │
+   └─ Paginated Reduction
+        Large payloads are chunked, reduced independently,
+        and merged into a final aggregated result
+```
 
+Typical strategy conditions:
 
-## 5. Iterative Data Loading
+* **Direct Pass**
 
-The executor retrieves data in pages:
+  * small payloads
+  * reduction overhead would exceed benefits
+  * endpoints without pagination support
+
+* **Single Reduction**
+
+  * moderate payload sizes
+  * reduction is beneficial
+  * pagination is unnecessary
+
+* **Paginated Reduction**
+
+  * large payloads exceeding effective context budgets
+  * endpoints supporting pagination
+
+For paginated reduction, the executor calculates:
+
+* average tokens per item
+* optimal chunk/page size
+* estimated number of pages
+* effective context utilization
+
+The executor then retrieves data iteratively in pages:
 
 ```text
 GET /tickets?offset=0&limit=29
@@ -262,19 +299,18 @@ GET /tickets?offset=58&limit=29
 ...
 ```
 
-
-## 6. Semantic Reduction
+## 5. Semantic Reduction
 
 Each chunk is processed by the reducer model.
 
 Reducer responsibilities:
 
-- semantic filtering
-- summarization
-- aggregation
-- removal of irrelevant payload data
-- reduction of context saturation
-- mitigation of attention dilution effects
+* semantic filtering
+* summarization
+* aggregation
+* removal of irrelevant payload data
+* reduction of context saturation
+* mitigation of attention dilution effects
 
 The reduction pipeline helps preserve relevant information density while minimizing unnecessary token usage.
 
@@ -282,17 +318,17 @@ This is important because modern LLMs operate with a finite context window, and 
 
 Large prompts may suffer from:
 
-- attention dilution
-- lost-in-the-middle effects
-- degraded reasoning quality
-- higher latency
-- increased token costs
+* attention dilution
+* lost-in-the-middle effects
+* degraded reasoning quality
+* higher latency
+* increased token costs
 
 For this reason, the framework distinguishes between:
 
-| Parameter | Description |
-|---|---|
-| `LLM_MAX_CONTEXT` | Maximum context size supported by the model |
+| Parameter                 | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| `LLM_MAX_CONTEXT`         | Maximum context size supported by the model      |
 | `LLM_CONTEXT_UTILIZATION` | Intentionally allowed fraction of usable context |
 
 Example:
@@ -304,8 +340,7 @@ LLM_CONTEXT_UTILIZATION=0.25
 
 In this configuration, the orchestration layer targets approximately 32k effective context usage, despite the model supporting 128k tokens.
 
-
-## 7. Final Aggregation
+## 6. Final Aggregation
 
 Reduced chunk outputs are merged and injected back into the orchestrator context.
 
