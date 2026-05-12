@@ -9,6 +9,7 @@ class OpenAPIAdapter:
         self.base_api_url = base_api_url.rstrip("/")
         self.openapi_url = f"{self.base_api_url}/openapi.json"
         self.bearer_token = bearer_token
+
         self.logger = logging.getLogger(__name__)
 
 

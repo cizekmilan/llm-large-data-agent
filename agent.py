@@ -71,8 +71,8 @@ client = OpenAI(
 
 # tools = definice funkcí pro LLM (název, popis, parametry), tedy ve formátu, kterému LLM dobře rozumí
 # operations = využívám zde v orchestraci pro reálné volání toolu
-adapter = OpenAPIAdapter(BASE_API_URL, BASE_API_TOKEN)  # pro OpenAPI
-#adapter = MCPAdapter(MCP_URL, MCP_TOKEN)  # pro MCP
+#adapter = OpenAPIAdapter(BASE_API_URL, BASE_API_TOKEN)  # pro OpenAPI
+adapter = MCPAdapter(MCP_URL, MCP_TOKEN)  # pro MCP
 tools, operations = adapter.get_tools()
 
 
