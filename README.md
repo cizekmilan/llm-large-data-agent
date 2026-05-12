@@ -36,11 +36,12 @@ The goal of this project is to explore an architecture that allows an LLM agent 
 
 The project separates the system into multiple specialized layers:
 
-| Component                        | Responsibility                                     | Implementation |
-| -------------------------------- | -------------------------------------------------- | -------------- |
-| LLM1 (Main Agent / Orchestrator) | reasoning, planning, tool selection                | `agent.py`     |
-| Tool Adapter                     | OpenAPI tool generation, API execution, transport layer  | `adapters/openapi_adapter.py`   |
-| LLM2 (Reducer)                   | semantic reduction and aggregation                 | `reducer.py`   |
+| Component                        | Responsibility                                     | Implementation                |
+| -------------------------------- | -------------------------------------------------- | ----------------------------- |
+| LLM1 (Main Agent / Orchestrator) | reasoning, planning, tool selection                | `agent.py`                    |
+| OpenAPI Adapter                  | OpenAPI schema parsing, REST API execution         | `adapters/openapi_adapter.py` |
+| MCP Adapter                      | MCP tool discovery, JSON-RPC transport execution   | `adapters/mcp_adapter.py`     |
+| LLM2 (Reducer)                   | semantic reduction and aggregation                 | `reducer.py`                  |
 
 Instead of allowing the main model to directly process extremely large datasets, the architecture:
 
@@ -61,27 +62,38 @@ Core concepts:
 - adaptive pagination
 - chunk-based processing
 - semantic reduction pipeline
-- OpenAPI-driven tool generation
+- provider-agnostic tool integration
+- OpenAPI and MCP adapter abstraction
 - short-term vs long-term memory separation
 
 
 # 📋 Key Features
 
-## OpenAPI Tool Generation
+## Tool Provider Adapters
 
-The framework dynamically parses `openapi.json` and generates:
+The framework supports multiple tool provider backends through adapter abstractions.
 
-- tool schemas for the LLM
-- internal executor metadata
+Currently implemented:
 
-This allows external APIs to be integrated with minimal changes.
+- OpenAPI adapter
+- MCP adapter
+
+Both adapters normalize external tool definitions into a unified internal orchestration format used by the agent layer.
+
+Adapter responsibilities include:
+
+- tool discovery and parsing
+- LLM tool schema generation
+- tool execution
+- transport abstraction
+- internal executor metadata generation
 
 The framework intentionally separates:
 
 - LLM-facing tool schemas
 - internal executor orchestration metadata
 
-Pagination-related parameters such as `offset` and `limit` are intentionally removed from the tool schemas exposed to the LLM.
+Pagination-related parameters such as `offset` and `limit` are intentionally removed from tool schemas exposed to the LLM.
 
 This prevents the model from attempting autonomous pagination during reasoning, because pagination orchestration is handled exclusively by the executor layer.
 
@@ -148,7 +160,8 @@ This prevents uncontrolled context growth.
 ```text
 /
 ├── adapters/
-│   └── openapi_adapter.py           # OpenAPI tool adapter abstraction
+│   ├── openapi_adapter.py           # OpenAPI tool adapter abstraction
+│   └── mcp_adapter.py               # MCP JSON-RPC adapter abstraction
 │
 ├── agent.py                         # Main orchestration agent
 ├── misc.py                          # Shared helper functions
@@ -400,7 +413,7 @@ A dedicated planning/decomposition stage could split such queries into independe
 Planned improvements:
 
 - orchestrator/reducer prompt strategy improvements
-- MCP adapter implementation
+- advanced MCP session lifecycle handling
 - distributed processing
 - recursive reduction pipelines
 - adaptive reduction strategies
@@ -443,7 +456,14 @@ python agent.py
 Example `.env`:
 
 ```env
-LLM_API_BASE_URL=http://127.0.0.1:9001/v1
+# OpenAPI adapter
+BASE_API_URL="http://127.0.0.1:9001"
+BASE_API_TOKEN=dummy
+# MCP adapter
+MCP_URL=https://example.com/_mcp
+MCP_TOKEN=dummy
+
+LLM_API_BASE_URL=http://example.com:8000/v1
 LLM_API_KEY=dummy
 LLM_NAME=gpt-4.1-mini
 LLM_MAX_CONTEXT=131072
@@ -451,6 +471,8 @@ LLM_CONTEXT_UTILIZATION=0.25
 LLM_TEMPERATURE=0.0
 LLM_TOP_P=1.0
 LLM_TIMEOUT=60
+
+LOG_DIR="logs"
 ```
 
 
@@ -480,6 +502,7 @@ Current status:
 
 - ✅ architecture prototype implemented
 - ✅ OpenAPI adapter abstraction implemented
+- ✅ MCP adapter prototype functional
 - ✅ adaptive pagination functional
 - ✅ reducer pipeline functional
 - ⚠️ semantic chunk reduction experimental
