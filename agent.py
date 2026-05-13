@@ -227,7 +227,7 @@ while True:
                             total_pages = math.ceil(total_items / limit)
                             logger.info(f"[CHUNKING] total pages: {total_pages}")
 
-                            # PAGING a postupné zpracování všech chnků
+                            # PAGING a postupné zpracování všech chunků
                             partial_results = []
 
                             for offset in range(0, total_items, limit):
