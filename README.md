@@ -435,11 +435,22 @@ Known limitations:
 - no retry orchestration layer
 - structured output reliability depends on model behavior
 - context overflow handling is still evolving
+- no explicit planner/executor separation yet
+- retrieval dependencies are tracked only implicitly through conversation context
+- the agent currently operates mostly as a reactive execution loop (`LLM → tool → result → next iteration`)
+- no explicit working memory / entity state management yet
+- retrieved facts and model inferences are not formally separated
+- reducer-based compression may lose important identifiers, relationships, or retrieval context
+- long-running workflows may gradually lose execution intent or retrieval completeness
+- no provenance or retrieval verification layer yet
+- no deterministic computation / Python execution layer for advanced analytical workflows
 - complex multi-question prompts are not yet reliably decomposed into independent retrieval/reduction workflows[^1]
+- the comments are primarily Czech because the application was built as a study project
 
 [^1]: *Currently, if a single query contains multiple independent questions (e.g., about two different users), the orchestrator processes them sequentially within the same prompt.
-Due to chunking, retrieval, and reduction, the model typically produces a correct answer only for the first question, while subsequent questions may be ignored or incomplete.  
-A dedicated planning/decomposition stage could split such queries into independent subqueries, assign them to the retrieval/reduction pipeline, and aggregate results reliably.*
+Due to chunking, retrieval, and reduction, the model typically produces a correct answer only for the first question, while subsequent questions may be ignored, hallucinated, or incomplete.
+A dedicated planning/decomposition stage could split such queries into independent subqueries, assign them to the retrieval/reduction pipeline, and aggregate results more reliably.*
+
 
 # 🚀 Future Work
 
