@@ -57,7 +57,7 @@ Instead of allowing the main model to directly process extremely large datasets,
 
 # Architecture Overview
 
-![Architecture Diagram](docs/architecture_v3.svg)
+![Architecture Diagram](docs/architecture_v4.svg)
 
 Core concepts:
 
