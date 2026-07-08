@@ -2,6 +2,9 @@
 
 > Experimental orchestration framework exploring how LLM agents can process datasets significantly larger than the model context window using iterative retrieval and semantic reduction.
 
+![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 
 # 🧠 Motivation
 
