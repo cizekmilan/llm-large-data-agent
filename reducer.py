@@ -154,7 +154,7 @@ Input data:
     diff = new_tokens - orig_tokens   # pozor: obráceně pro přirozené znaménko
     percent = (diff / orig_tokens * 100) if orig_tokens > 0 else 0
     print(Back.WHITE + Fore.RED +
-          f"\nTOKEN CHANGE: {orig_tokens} -> {new_tokens} "
+          f"\nTOKENS CHANGE: {orig_tokens} -> {new_tokens} "
           f"(Δ{diff:+} / {percent:+.1f}%)")
 
     return reduced

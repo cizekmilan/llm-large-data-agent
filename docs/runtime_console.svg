@@ -66,13 +66,13 @@
     ITEM TYPES (2): reasoning, message
   </text>
 
-  <!-- TOKEN CHANGE BG -->
+  <!-- TOKENS CHANGE BG -->
   <rect x="20" y="320" width="1060" height="42" rx="4" fill="#ffffff"/>
   <text x="28" y="348"
         font-family="Consolas, monospace"
         font-size="22"
         fill="#d1242f">
-    TOKEN CHANGE: 76037 -> 256 (Δ-75781 / -99.7%)
+    TOKENS CHANGE: 76037 -> 256 (Δ-75781 / -99.7%)
   </text>
 
 </svg>
